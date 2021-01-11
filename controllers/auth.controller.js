@@ -2,8 +2,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcryptjs')
 const { registerValidation } = require('../validations/auth.validation')
 
-exports.register = async (req, res, next) => {
-  // const { email, password, name } = req.body
+exports.register = async (req, res) => {
   //? -------------------------------------------------------------  validate Data 
   const { error } = registerValidation(req.body)
   if (error) return res.status(400).send(error.details[0].message)
@@ -11,19 +10,17 @@ exports.register = async (req, res, next) => {
   try {
     const ifExist = await User.findOne({ email: req.body.email }).exec()
     if (ifExist) return res.status(400).send(`l'adress mail : ${req.body.email}  , existe deja`)
+    // ! -------------------------------------------------------------Hash the assword
+    const salt = await bcrypt.genSalt();
+    req.body.password = await bcrypt.hash(req.body.password, salt);
     //* -------------------------------------------------------------  create a new user
     const user = new User({
-      email: req.body.email,
-      name: req.body.name,
-      password: req.body.password
+      ...req.body
     })
     //!--------------------------------------------------------  register the user in the database
-    try {
-      await user.save()
-      res.status(201).send({ user: user._id, message: "Utulisateur crée avec succée" })
-    } catch (error) {
-      res.status(400).send({ error })
-    }
+    await user.save()
+    res.status(201).send({ user: user._id, message: "Utulisateur crée avec succée" })
+    // res.send({ user })
   } catch (error) {
     res.status(500).send({ error })
   }
