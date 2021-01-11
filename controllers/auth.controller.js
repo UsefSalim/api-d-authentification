@@ -10,7 +10,7 @@ exports.register = async (req, res) => {
   try {
     const ifExist = await User.findOne({ email: req.body.email }).exec()
     if (ifExist) return res.status(400).send(`l'adress mail : ${req.body.email}  , existe deja`)
-    // ! -------------------------------------------------------------Hash the assword
+    // ! -------------------------------------------------------------Hash the password
     const salt = await bcrypt.genSalt();
     req.body.password = await bcrypt.hash(req.body.password, salt);
     //* -------------------------------------------------------------  create a new user

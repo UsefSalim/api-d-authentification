@@ -4,5 +4,7 @@ mongoose.connect(process.env.DB_CONNECT,
     useUnifiedTopology: true,
     useNewUrlParser: true
   },
-  () => console.log("MongoDb Connected")
+
 )
+  .then(() => console.log("BD connecter"))
+  .catch(err => console.log(err))
