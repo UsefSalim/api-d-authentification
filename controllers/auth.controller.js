@@ -26,7 +26,6 @@ exports.register = async (req, res) => {
     res.status(500).send({ error })
   }
 }
-
 exports.login = async (req, res) => {
   //? -------------------------------------------------------------  validate Data 
   const { error } = loginValidation(req.body)
@@ -36,7 +35,7 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email: req.body.email }).exec()
     if (!user) return res.status(400).send(`email ou password incorrete`)
     // ! -------------------------------------------------------------veriffier e mots de pass
-    const validPassword = bcrypt.compare(req.body.password, user.password)
+    const validPassword = await bcrypt.compare(req.body.password, user.password)
     if (!validPassword) return res.status(400).send(`email ou password incorrete`)
     //*------------------------------------------------------- crée et assigner un token     
     const token = jwt.sign({ _id: user._id }, process.env.SECRET_TOKEN)
@@ -45,5 +44,8 @@ exports.login = async (req, res) => {
   } catch (error) {
     res.status(500).send({ error })
   }
+}
+exports.logout = async (req, res) => {
+
 }
 
