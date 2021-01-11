@@ -1,6 +1,7 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs')
-const { registerValidation } = require('../validations/auth.validation')
+const jwt = require('jsonwebtoken')
+const { registerValidation, loginValidation } = require('../validations/auth.validation')
 
 exports.register = async (req, res) => {
   //? -------------------------------------------------------------  validate Data 
@@ -26,7 +27,23 @@ exports.register = async (req, res) => {
   }
 }
 
-exports.login = (req, res) => {
-  res.send('login route')
+exports.login = async (req, res) => {
+  //? -------------------------------------------------------------  validate Data 
+  const { error } = loginValidation(req.body)
+  if (error) return res.status(400).send(error.details[0].message)
+  try {
+    //? ------------------------------------------------------------verify if mail exist 
+    const user = await User.findOne({ email: req.body.email }).exec()
+    if (!user) return res.status(400).send(`email ou password incorrete`)
+    // ! -------------------------------------------------------------veriffier e mots de pass
+    const validPassword = bcrypt.compare(req.body.password, user.password)
+    if (!validPassword) return res.status(400).send(`email ou password incorrete`)
+    //*------------------------------------------------------- crée et assigner un token     
+    const token = jwt.sign({ _id: user._id }, process.env.SECRET_TOKEN)
+    res.header('jwt', token).send(token)
+    res.status(200).send(`l'utisisateur ${user.name} est connecter`)
+  } catch (error) {
+    res.status(500).send({ error })
+  }
 }
 
