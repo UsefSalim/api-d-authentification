@@ -1,11 +1,24 @@
 const dotenv = require('dotenv');
 dotenv.config({ path: "./config/.env" })
-const express = require('express');
 require('./config/dbConnect')
+const express = require('express');
+const bodyParser = require('body-parser')
+const UserRoutes = require('./routes/user.routes')
+
 
 const app = express()
 const PORT = process.env.PORT || 5000
 
+// * Middlewares 
+app.use(bodyParser.json())
+app.use(
+  bodyParser.urlencoded({
+    extended: false
+  })
+)
+
+
+app.use('/api/user', UserRoutes)
 
 
 app.listen(PORT, () => console.log(`Application connectée au port : ${PORT}`))
