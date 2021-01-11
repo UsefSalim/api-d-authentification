@@ -3,6 +3,7 @@ require('./config/dbConnect')
 const express = require('express');
 const bodyParser = require('body-parser')
 const UserRoutes = require('./routes/user.routes')
+const PostsRoutes = require('./routes/posts.routes')
 
 
 const app = express()
@@ -18,6 +19,7 @@ app.use(
 
 
 app.use('/api/user', UserRoutes)
+app.use('/api/posts', PostsRoutes)
 
 
 app.listen(PORT, () => console.log(`Application connectée au port : ${PORT}`))
